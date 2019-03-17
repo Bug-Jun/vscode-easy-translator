@@ -60,8 +60,12 @@ Users appreciate release notes as you update your extension.
 
 ## Version
 
-### 1.0.0317
+### 1.0.1903
 
 - 支持28种语言互译
+
+### 1.4.1903
+
+- 修复模块找不到的问题
 
 **Enjoy!**
