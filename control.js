@@ -1,5 +1,5 @@
 const vscode = require('vscode');
-const request = require('request');
+const request = require('./request/index');
 const languages = require('./languages');
 
 //创建快速拾取器
