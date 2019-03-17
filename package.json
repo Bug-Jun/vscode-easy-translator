@@ -1,0 +1,58 @@
+{
+	"name": "easy-translator",
+	"displayName": "简易翻译器（Easy Translator）",
+	"description": "非常简易的一个翻译器，使用百度的翻译api，支持28种语言互译",
+	"version": "1.0.0",
+	"publisher": "bugjun",
+	"engines": {
+		"vscode": "^1.32.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"icon": "images/icon.png",
+	"activationEvents": [
+		"*"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"menus": {
+			"editor/context": [
+				{
+					"when": "editorHasSelection",
+					"command": "translator.translate",
+					"group": "navigation"
+				}
+			]
+		},
+		"commands": [
+			{
+				"title": "%command.translator.translate%",
+				"command": "translator.translate",
+				"category": "%category.translator%"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "translator.translate",
+				"key": "Ctrl+Alt+T"
+			}
+		]
+	},
+	"scripts": {
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "node ./node_modules/vscode/bin/test"
+	},
+	"devDependencies": {
+		"typescript": "^3.3.1",
+		"vscode": "^1.1.28",
+		"eslint": "^5.13.0",
+		"@types/node": "^10.12.21",
+		"@types/mocha": "^2.2.42"
+	},
+	"dependencies": {},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sxei/vscode-plugin-demo"
+	}
+}
