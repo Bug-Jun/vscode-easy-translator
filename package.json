@@ -2,7 +2,7 @@
 	"name": "easy-translator",
 	"displayName": "简易翻译器（Easy Translator）",
 	"description": "非常简易的一个翻译器，使用百度的翻译api，支持28种语言互译",
-	"version": "1.0.0",
+	"version": "1.0.1903",
 	"publisher": "bugjun",
 	"engines": {
 		"vscode": "^1.32.0"
@@ -10,7 +10,7 @@
 	"categories": [
 		"Other"
 	],
-	"icon": "images/icon.png",
+	"icon": "logo.png",
 	"activationEvents": [
 		"*"
 	],
@@ -53,6 +53,6 @@
 	"dependencies": {},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/sxei/vscode-plugin-demo"
+		"url": "https://github.com/Bug-Jun/easy-translator"
 	}
 }
