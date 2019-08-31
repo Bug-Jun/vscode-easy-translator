@@ -71,7 +71,7 @@ Users appreciate release notes as you update your extension.
 
 - 修复模块找不到的问题
 
-### 1.5.08
+### 1.5.1908
 
 - 修复翻译失败问题
 - 添加有道智云API
