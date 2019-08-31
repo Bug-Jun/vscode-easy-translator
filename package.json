@@ -2,7 +2,7 @@
 	"name": "easy-translator",
 	"displayName": "简易翻译器（Easy Translator）",
 	"description": "非常简易的一个翻译器，使用百度的翻译api，支持28种语言互译",
-	"version": "1.4.1903",
+	"version": "1.5.08",
 	"publisher": "bugjun",
 	"engines": {
 		"vscode": "^1.32.0"
@@ -14,7 +14,7 @@
 	"activationEvents": [
 		"*"
 	],
-	"main": "./extension.js",
+	"main": "./src/extension.js",
 	"contributes": {
 		"menus": {
 			"editor/context": [
@@ -37,6 +37,48 @@
 				"command": "translator.translate",
 				"key": "Ctrl+Alt+T"
 			}
+		],
+		"configuration": [
+			{
+				"title": "简易翻译器",
+				"properties": {
+					"easyTranslator.API.baiduAPPID": {
+						"type": "string",
+						"default": "",
+						"description": "设置百度翻译API的APPID"
+					},
+					"easyTranslator.API.baiduKey": {
+						"type": "string",
+						"default": "",
+						"description": "设置百度翻译API的密钥"
+					},
+					"easyTranslator.API.youdaoAppKey": {
+						"type": "string",
+						"default": "",
+						"description": "设置有道翻译API的应用ID"
+					},
+					"easyTranslator.API.youdaoKey": {
+						"type": "string",
+						"default": "",
+						"description": "设置有道翻译API的应用密钥"
+					},
+					"easyTranslator.API.type": {
+						"type": "string",
+						"default": "baidu",
+						"enum": [
+							// "Google",
+							"baidu",
+							"youdao"
+						],
+						"enumDescriptions": [
+							// "使用谷歌翻译API",
+							"使用百度翻译API，支持28种语言实时互译，使用前需申请并设置APPID以及密钥",
+							"使用有道翻译API，包含了中英翻译和小语种翻译功能，使用前需申请并设置应用ID以及应用密钥"
+						],
+						"description": "选择翻译接口"
+					}
+				}
+			}
 		]
 	},
 	"scripts": {
@@ -50,7 +92,11 @@
 		"@types/node": "^10.12.21",
 		"@types/mocha": "^2.2.42"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"js-md5": "^0.7.3",
+		"js-sha256": "^0.9.0",
+		"request": "^2.88.0"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Bug-Jun/easy-translator"
