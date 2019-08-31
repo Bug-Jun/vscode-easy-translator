@@ -1,7 +1,7 @@
 {
 	"name": "easy-translator",
 	"displayName": "简易翻译器（Easy Translator）",
-	"description": "非常简易的一个翻译器，使用百度的翻译api，支持28种语言互译",
+	"description": "这是一个非常简易的一个翻译器，可使用百度、有道的翻译APi",
 	"version": "1.5.1908",
 	"publisher": "bugjun",
 	"engines": {

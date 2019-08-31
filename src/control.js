@@ -169,7 +169,8 @@ const commands = {
         let text = document.getText(selection);
 
         if(!!text){
-            fillQuickPick(languages.map(item => ({
+            let sourceLanguages = getLanguages();
+            fillQuickPick(sourceLanguages.map(item => ({
                 label: item.label,
                 description: item.des,
                 action: () => translate(text, 'auto', item.tag)
