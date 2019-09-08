@@ -28,22 +28,22 @@ const fillQuickPick = (items, title) => {
 }
 
 //发送翻译请求
-const translate = (query, from, to) => {
+const translate = (...arg) => {
     let type = vscode.workspace.getConfiguration().get('easyTranslator.API.type');
     switch(type){
         case "Google":
-            googleTranslate(query, from, to);
+            googleTranslate(...arg);
             break;
         case "baidu":
-            baiduTranslate(query, from, to);
+            baiduTranslate(...arg);
             break;
         case "youdao":
-            youdaoTranslate(query, from, to);
+            youdaoTranslate(...arg);
             break;
     }
 }
 
-const googleTranslate = (query, from, to) => {
+const googleTranslate = (query, from, to, fn) => {
     console.log(encodeURI(`http://translate.google.cn/translate_a/single?client=gtx&dt=t&dj=1&ie=UTF-8&sl=${from}&tl=${to}&q=${query}`))
     //发送请求
     request.get({
@@ -58,7 +58,7 @@ const googleTranslate = (query, from, to) => {
     });
 }
 
-const baiduTranslate = (query, from, to) => {
+const baiduTranslate = (query, from, to, fn) => {
     let appid = vscode.workspace.getConfiguration().get('easyTranslator.API.baiduAPPID');
     let key = vscode.workspace.getConfiguration().get('easyTranslator.API.baiduKey');
     if(!!appid && !!key){
@@ -71,35 +71,33 @@ const baiduTranslate = (query, from, to) => {
             url: encodeURI(`${url}?q=${query}&from=${from}&to=${to}&appid=${appid}&salt=${salt}&sign=${sign}`)
         }, function(err, res, result){
             if(err){
-                vscode.window.showErrorMessage('翻译出错了');
-                quickPick.hide();
+                fn('翻译出错了');
                 return;
             }else{
                 try{
                     let msg = JSON.parse(result);
                     if(msg.error_code){
-                        vscode.window.showErrorMessage(`翻译出错了：${errorMsg.baidu[msg.error_code]}`);
+                        fn(`翻译出错了：${errorMsg.baidu[msg.error_code]}`);
+                        return;
                     }else{
-                        let strArr = [];
-                        for (const key in msg.trans_result) {
-                            strArr.push(msg.trans_result[key].dst);
-                        }
-                        vscode.window.showInformationMessage(strArr.join(';'));
+                        fn(false, {
+                            type: "baidu",
+                            msg
+                        });
                     }
-                    quickPick.hide();
                 }catch(error){
-                    vscode.window.showErrorMessage('翻译出错了');
-                    quickPick.hide();
+                    fn('翻译出错了');
+                    return;
                 }
             }
         });
     }else{
-        vscode.window.showErrorMessage('请设置百度翻译APPID以及密钥');
-        quickPick.hide();
+        fn('请设置百度翻译APPID以及密钥');
+        return;
     }
 }
 
-const youdaoTranslate = (query, from, to) => {
+const youdaoTranslate = (query, from, to, fn) => {
     let appid = vscode.workspace.getConfiguration().get('easyTranslator.API.youdaoAppKey');
     let key = vscode.workspace.getConfiguration().get('easyTranslator.API.youdaoKey');
     if(!!appid && !!key){
@@ -124,39 +122,30 @@ const youdaoTranslate = (query, from, to) => {
             url: encodeURI(`${url}?q=${query}&from=${from}&to=${to}&appKey=${appid}&salt=${salt}&sign=${sign}&signType=v3&curtime=${curtime}`)
         }, function(err, res, result){
             if(err){
-                vscode.window.showErrorMessage('翻译出错了');
-                quickPick.hide();
+                console.log(1);
+                fn('翻译出错了');
                 return;
             }else{
                 try{
                     let msg = JSON.parse(result);
                     if(msg.errorCode != '0'){
-                        vscode.window.showErrorMessage(`翻译出错了：${errorMsg.youdao[msg.errorCode]}`);
+                        fn(`翻译出错了：${errorMsg.youdao[msg.errorCode]}`);
+                        return;
                     }else{
-                        let basic = msg.basic;
-                        let info = '';
-                        if(basic && basic["explains"] && basic["explains"].length > 0){
-                            info = basic["explains"].join('; ');
-                            if(basic && basic["phonetic"]){
-                                vscode.window.showInformationMessage('[' + basic["phonetic"] + ']  ' + info);
-                            }else{
-                                vscode.window.showInformationMessage(info);
-                            }
-                        }else{
-                            info = msg.translation.join('; ');
-                            vscode.window.showInformationMessage(info);
-                        }
+                        fn(false, {
+                            type: "youdao",
+                            msg
+                        });
                     }
-                    quickPick.hide();
                 }catch(error){
-                    vscode.window.showErrorMessage('翻译出错了');
-                    quickPick.hide();
+                    fn('翻译出错了');
+                    return;
                 }
             }
         });
     }else{
-        vscode.window.showErrorMessage('请设置有道翻译应用ID以及应用密钥');
-        quickPick.hide();
+        fn('请设置有道翻译应用ID以及应用密钥');
+        return;
     }
 }
 
@@ -164,41 +153,200 @@ const youdaoTranslate = (query, from, to) => {
 //命令数组
 const commands = {
     translate: () => {
-        let document = vscode.window.activeTextEditor.document;
-		let selection = vscode.window.activeTextEditor.selection;
-        let text = document.getText(selection);
-
-        if(!!text){
+        vscode.window.showInputBox({
+            placeHolder: "翻译源文本",
+            prompt: "请输入需要翻译的文本"
+        }).then( text => {
             let sourceLanguages = getLanguages();
             fillQuickPick(sourceLanguages.map(item => ({
                 label: item.label,
                 description: item.des,
-                action: () => translate(text, 'auto', item.tag)
-            })), '请选择目标语言');
-        }else{
+                action: () => {
+                    let targetLanguages = getTarget(item, sourceLanguages);
+
+                    fillQuickPick(targetLanguages.map(item_2 => ({
+                        label: item_2.label,
+                        description: item_2.des,
+                        action: () => translate(text, item.tag, item_2.tag, showMessage)
+                    })), '请选择目标语言');
+                }
+            })), '请选择源文本语言');
+        });
+    },
+    target: () => {
+        let targetLanguages = getLanguages();
+        fillQuickPick(targetLanguages.map(item => ({
+            label: item.label,
+            description: item.des,
+            action: () => {
+                vscode.workspace.getConfiguration().update('easyTranslator.QuickTarget', item.tag, true);
+                targetBtn.text = `快速翻译为${item.label}`;
+                quickPick.hide();
+            }
+        })), '请选择快速翻译的目标语言');
+    },
+    api: () => {
+        let apis = [{
+            name: '百度翻译',
+            code: 'baidu'
+        },{
+            name: '有道智云',
+            code: 'youdao'
+        }];
+        fillQuickPick(apis.map(api => ({
+            label: api.name,
+            description: api.code,
+            action: () => {
+                vscode.workspace.getConfiguration().update('easyTranslator.API.type', api.code, true);
+                quickPick.hide();
+            }
+        })), '请选择快速翻译的目标语言');
+    },
+    baidu: () => {
+        vscode.window.showInputBox({
+            ignoreFocusOut: true,
+            value: vscode.workspace.getConfiguration().get('easyTranslator.API.baiduAPPID'),
+            placeHolder: "百度翻译APPID",
+            prompt: "设置百度翻译API的APPID"
+        }).then(appid => {
+            if(typeof appid !== 'undefined'){
+                vscode.workspace.getConfiguration().update('easyTranslator.API.baiduAPPID', appid, true);
+            }
             vscode.window.showInputBox({
-                placeHolder: "翻译源文本",
-                prompt: "请输入需要翻译的文本"
-            }).then( text => {
-                let sourceLanguages = getLanguages();
-                fillQuickPick(sourceLanguages.map(item => ({
-                    label: item.label,
-                    description: item.des,
-                    action: () => {
-                        let targetLanguages = getTarget(item, sourceLanguages);
-
-                        fillQuickPick(targetLanguages.map(item_2 => ({
-                            label: item_2.label,
-                            description: item_2.des,
-                            action: () => {
-                                translate(text, item.tag, item_2.tag);
-                            }
-                        })), '请选择目标语言');
-                    }
-                })), '请选择源文本语言');
+                ignoreFocusOut: true,
+                value: vscode.workspace.getConfiguration().get('easyTranslator.API.baiduKey'),
+                placeHolder: "百度翻译密钥",
+                prompt: "设置百度翻译API的密钥"
+            }).then(key => {
+                if(typeof key !== 'undefined'){
+                    vscode.workspace.getConfiguration().update('easyTranslator.API.baiduKey', key, true);
+                }
             });
-        }
+        });
+    },
+    youdao: () => {
+        vscode.window.showInputBox({
+            ignoreFocusOut: true,
+            value: vscode.workspace.getConfiguration().get('easyTranslator.API.youdaoAppKey'),
+            placeHolder: "有道智云应用ID",
+            prompt: "设置有道智云翻译API的应用ID"
+        }).then(appid => {
+            if(typeof appid !== 'undefined'){
+                vscode.workspace.getConfiguration().update('easyTranslator.API.youdaoAppKey', appid, true);
+            }
+            vscode.window.showInputBox({
+                ignoreFocusOut: true,
+                value: vscode.workspace.getConfiguration().get('easyTranslator.API.youdaoKey'),
+                placeHolder: "有道智云密钥",
+                prompt: "设置有道智云翻译API的应用密钥"
+            }).then(key => {
+                if(typeof key !== 'undefined'){
+                    vscode.workspace.getConfiguration().update('easyTranslator.API.youdaoKey', key, true);
+                }
+            });
+        });
+    },
+    quick: () => {
+        let target = vscode.workspace.getConfiguration().get('easyTranslator.QuickTarget');
+        
+        let document = vscode.window.activeTextEditor.document;
+		let selection = vscode.window.activeTextEditor.selection;
+        let text = document.getText(selection);
+        translate(text, 'auto', target, showMessage);
+    }
+}
 
+const showMessage = (err, data) => {
+    if(!!err){
+        vscode.window.showErrorMessage(err);
+    }else{
+        switch(data.type){
+            case "baidu":
+                let strArr = [];
+                for (const key in data.msg.trans_result) {
+                    strArr.push(data.msg.trans_result[key].dst);
+                }
+                vscode.window.showInformationMessage(strArr.join(';'));
+                break;
+            case "youdao":
+                let basic = data.msg.basic;
+                let info = '';
+                if(basic && basic["explains"] && basic["explains"].length > 0){
+                    info = basic["explains"].join('; ');
+                    if(basic && basic["phonetic"]){
+                        vscode.window.showInformationMessage('[' + basic["phonetic"] + ']  ' + info);
+                    }else{
+                        vscode.window.showInformationMessage(info);
+                    }
+                }else{
+                    info = data.msg.translation.join('; ');
+                    vscode.window.showInformationMessage(info);
+                }
+                break;
+        }
+    };
+    quickPick.hide();
+}
+
+const showHove = text => {
+    return new Promise(resolve  => {
+        let result = '';
+        let language = vscode.workspace.getConfiguration().get('easyTranslator.QuickTarget');
+        translate(text, 'auto', language, (err, data) => {
+            if(err){
+                resolve(err);
+            }else{
+                switch(data.type){
+                    case "baidu":
+                        result += '**百度翻译**\n';
+                        let arr = data.msg.trans_result.map( item => `- ${item.dst}`);
+                        console.log(arr)
+                        result += arr.join('\n');
+                        break;
+                    case "youdao":
+                        result += '**有道智云**\n';
+                        let translation = data.msg.translation.map( item => `- ${item}`);
+                        result += translation.join('\n');
+                        result += '\n\n';
+                        if(data.msg['basic']){
+                            let basic = data.msg['basic'];
+                            result += '基本释义：\n';
+                            if(basic['phonetic']){
+                                result += `\n[${basic.phonetic}] ${text}\n`;
+                            }
+                            if(basic['explains']){
+                                let explains = basic.explains.map( item => `- ${item}`)
+                                result += explains.join('\n');
+                                result += '\n\n';
+                            }
+                        }
+                        if(data.msg['web']){
+                            let web = data.msg['web'];
+                            result += '网络释义：\n';
+                            web.forEach(item => {
+                                result += `- ${item.key} - ${item.value.join('、')}\n`;
+                            });
+                        }
+                        break;
+                }
+                resolve(result);
+            }
+        });
+    });
+}
+
+let provide = {
+    async provideHover (document, position, token) {
+        let range = document.getWordRangeAtPosition(position)
+        let selection = vscode.window.activeTextEditor.selection
+        let string = document.getText(selection) ? document.getText(selection) : range ? document.getText(range) : ""
+        if(!string) return
+
+        let result = await showHove(string);
+
+        if(!!result){
+            return new vscode.Hover(result);
+        }
     }
 }
 
@@ -234,10 +382,36 @@ const getTarget = (item, sourceLanguages) => {
     return temp;
 }
 
+const labelToLanguage = () => {
+    languages.forEach(language => {
+        if(language == vscode.workspace.getConfiguration().get('easyTranslator.QuickTarget')){
+            let type = vscode.workspace.getConfiguration().get('easyTranslator.API.type');
+            return language.tag[type];
+        }
+    });
+}
+
+//创建状态栏项
+const targetBtn = vscode.window.createStatusBarItem(2);
+languages.forEach(language => {
+    let type = vscode.workspace.getConfiguration().get('easyTranslator.API.type');
+    if(language.tag[type] == vscode.workspace.getConfiguration().get('easyTranslator.QuickTarget')){
+        targetBtn.text = `快速翻译为${language.label}`;
+    }
+});
+targetBtn.tooltip = '选择快速翻译的目标语言';
+
+
 const control = {
     activate: context => {
-        const registration = Object.keys(commands).map(name => vscode.commands.registerCommand(`translator.${name}`, commands[name]));
-        registration.forEach(command => context.subscriptions.push(command));
+        Object.keys(commands).map(name => {
+            context.subscriptions.push(vscode.commands.registerCommand(`translator.${name}`, commands[name]));
+        });
+        context.subscriptions.push(vscode.languages.registerHoverProvider('*', provide));
+        
+        targetBtn.command = 'translator.target';
+        if(!targetBtn.text) targetBtn.text = '快速翻译为英语';
+        targetBtn.show();
     }
 }
 

@@ -1,4 +1,9 @@
 {
+    "category.translator": "Translator",
     "command.translator.translate": "translate",
-    "category.translator": "Translator"
+    "command.translator.target": "target",
+    "command.translator.api": "api",
+    "command.translator.baidu": "baidu",
+    "command.translator.youdao": "youdao",
+    "command.translator.quick": "quick"
 }

@@ -1,4 +1,9 @@
 {
+    "category.translator": "翻译器",
     "command.translator.translate": "翻译",
-    "category.translator": "翻译器"
+    "command.translator.target": "目标语言",
+    "command.translator.api": "翻译接口",
+    "command.translator.baidu": "设置百度翻译",
+    "command.translator.youdao": "设置有道智云",
+    "command.translator.quick": "快速翻译"
 }

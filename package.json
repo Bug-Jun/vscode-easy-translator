@@ -2,7 +2,7 @@
 	"name": "easy-translator",
 	"displayName": "简易翻译器（Easy Translator）",
 	"description": "这是一个非常简易的一个翻译器，可使用百度、有道的翻译APi",
-	"version": "1.5.1908",
+	"version": "2.0.1909",
 	"publisher": "bugjun",
 	"engines": {
 		"vscode": "^1.32.0"
@@ -20,7 +20,7 @@
 			"editor/context": [
 				{
 					"when": "editorHasSelection",
-					"command": "translator.translate",
+					"command": "translator.quick",
 					"group": "navigation"
 				}
 			]
@@ -30,12 +30,41 @@
 				"title": "%command.translator.translate%",
 				"command": "translator.translate",
 				"category": "%category.translator%"
+			},
+			{
+				"title": "%command.translator.target%",
+				"command": "translator.target",
+				"category": "%category.translator%"
+			},
+			{
+				"title": "%command.translator.api%",
+				"command": "translator.api",
+				"category": "%category.translator%"
+			},
+			{
+				"title": "%command.translator.baidu%",
+				"command": "translator.baidu",
+				"category": "%category.translator%"
+			},
+			{
+				"title": "%command.translator.youdao%",
+				"command": "translator.youdao",
+				"category": "%category.translator%"
+			},
+			{
+				"title": "%command.translator.quick%",
+				"command": "translator.quick",
+				"category": "%category.translator%"
 			}
 		],
 		"keybindings": [
 			{
 				"command": "translator.translate",
 				"key": "Ctrl+Alt+T"
+			},
+			{
+				"command": "translator.quick",
+				"key": "Ctrl+Alt+Q"
 			}
 		],
 		"configuration": [
@@ -74,6 +103,11 @@
 							"使用有道翻译API，包含了中英翻译和小语种翻译功能，使用前需申请并设置应用ID以及应用密钥"
 						],
 						"description": "选择翻译接口"
+					},
+					"easyTranslator.QuickTarget": {
+						"type": "string",
+						"default": "en",
+						"description": "设置快速翻译的目标语言代码"
 					}
 				}
 			}

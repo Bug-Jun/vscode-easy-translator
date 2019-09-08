@@ -37,6 +37,8 @@
 - 粤语（仅百度翻译）
 - 文言文（仅百度翻译）
 
+鼠标悬停翻译、右键快速翻译
+
 ## Requirements
 
 > 没有...
@@ -47,19 +49,13 @@
 
 输入命令前缀 `翻译器` 或 `Translator`
 
-在编辑器选中文本可点击右键菜单中的 `翻译` 或使用快捷键 <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd> 进行翻译
+在编辑器选中文本可点击右键菜单中的 `快速翻译` 或使用快捷键 <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Q</kbd> 进行翻译
+
+鼠标悬停在编辑器文本上可获得翻译内容，你还可以用鼠标选定你需要的文本再将鼠标悬停在上面获取翻译内容
 
 ## Extension Settings
 
 > 也没有...
-
-## Known Issues
-
-> 待补充...
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
 
 ## Version
 
@@ -75,5 +71,11 @@ Users appreciate release notes as you update your extension.
 
 - 修复翻译失败问题
 - 添加有道智云API
+
+### 2.0.1909
+
+- 添加鼠标悬停翻译
+- 添加F1命令设置翻译Api
+- 修改右键快速翻译
 
 **Enjoy!**
