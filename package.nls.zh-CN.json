@@ -5,5 +5,6 @@
     "command.translator.api": "翻译接口",
     "command.translator.baidu": "设置百度翻译",
     "command.translator.youdao": "设置有道智云",
-    "command.translator.quick": "快速翻译"
+    "command.translator.quick": "快速翻译",
+    "command.translator.hover": "悬停翻译"
 }

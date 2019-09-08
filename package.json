@@ -2,7 +2,7 @@
 	"name": "easy-translator",
 	"displayName": "简易翻译器（Easy Translator）",
 	"description": "这是一个非常简易的一个翻译器，可使用百度、有道的翻译APi",
-	"version": "2.0.1909",
+	"version": "2.1.1909",
 	"publisher": "bugjun",
 	"engines": {
 		"vscode": "^1.32.0"
@@ -54,6 +54,11 @@
 			{
 				"title": "%command.translator.quick%",
 				"command": "translator.quick",
+				"category": "%category.translator%"
+			},
+			{
+				"title": "%command.translator.hover%",
+				"command": "translator.hover",
 				"category": "%category.translator%"
 			}
 		],
@@ -108,6 +113,15 @@
 						"type": "string",
 						"default": "en",
 						"description": "设置快速翻译的目标语言代码"
+					},
+					"easyTranslator.OpenHover": {
+						"type": "string",
+						"default": "开启",
+						"enum": [
+							"开启",
+							"关闭"
+						],
+						"description": "设置开启或关闭鼠标悬停翻译"
 					}
 				}
 			}

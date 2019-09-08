@@ -253,6 +253,11 @@ const commands = {
 		let selection = vscode.window.activeTextEditor.selection;
         let text = document.getText(selection);
         translate(text, 'auto', target, showMessage);
+    },
+    hover: () => {
+        let hover = vscode.workspace.getConfiguration().get('easyTranslator.OpenHover') == '开启' ? '关闭' : '开启';
+        vscode.workspace.getConfiguration().update('easyTranslator.OpenHover', hover, true);
+        hoverBtn.text = `鼠标悬停翻译：${hover}`;
     }
 }
 
@@ -337,6 +342,10 @@ const showHove = text => {
 
 let provide = {
     async provideHover (document, position, token) {
+        //判断是否开启鼠标悬停翻译
+        if(vscode.workspace.getConfiguration().get('easyTranslator.OpenHover') == '关闭'){
+            return
+        }
         let range = document.getWordRangeAtPosition(position)
         let selection = vscode.window.activeTextEditor.selection
         let string = document.getText(selection) ? document.getText(selection) : range ? document.getText(range) : ""
@@ -382,15 +391,6 @@ const getTarget = (item, sourceLanguages) => {
     return temp;
 }
 
-const labelToLanguage = () => {
-    languages.forEach(language => {
-        if(language == vscode.workspace.getConfiguration().get('easyTranslator.QuickTarget')){
-            let type = vscode.workspace.getConfiguration().get('easyTranslator.API.type');
-            return language.tag[type];
-        }
-    });
-}
-
 //创建状态栏项
 const targetBtn = vscode.window.createStatusBarItem(2);
 languages.forEach(language => {
@@ -400,6 +400,10 @@ languages.forEach(language => {
     }
 });
 targetBtn.tooltip = '选择快速翻译的目标语言';
+
+const hoverBtn = vscode.window.createStatusBarItem(2);
+hoverBtn.text = `鼠标悬停翻译：${vscode.workspace.getConfiguration().get('easyTranslator.OpenHover')}`
+targetBtn.tooltip = '设置开启或关闭鼠标悬停翻译';
 
 
 const control = {
@@ -412,6 +416,9 @@ const control = {
         targetBtn.command = 'translator.target';
         if(!targetBtn.text) targetBtn.text = '快速翻译为英语';
         targetBtn.show();
+
+        hoverBtn.command = 'translator.hover';
+        hoverBtn.show();
     }
 }
 

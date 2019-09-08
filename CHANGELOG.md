@@ -28,3 +28,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Changed
 - 修改右键快速翻译
+
+## [2.1.1909] - 2019-09-08
+### Addded
+- 添加了悬停翻译开关
